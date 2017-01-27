@@ -9,9 +9,9 @@
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <StackPanel>
-            
-        
             <TextBox Name="txtQuery" />
+            <Button Name="btnListen" Content="Listen" Click="btnListen_Click" />
+            <Button Name="btnStop" Content="Stop" Click="btnStop_Click" />
             <Button Name="btnQuery" Content="Query" Click="btnQuery_Click" />
             <TextBox Name="txtData" TextWrapping="Wrap" Text="" Height="284" RenderTransformOrigin="0.5,0.5"/>
             <MediaElement x:Name="mediaElement" Height="182" Margin="658,0,707,0" RenderTransformOrigin="0.5,0.5"/>

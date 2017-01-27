@@ -2,20 +2,22 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
+using Windows.Media.Capture;
+using Windows.Media.MediaProperties;
+using Windows.Media.SpeechRecognition;
 using Windows.Media.SpeechSynthesis;
+using Windows.Storage;
+using Windows.Storage.Pickers;
+using Windows.Storage.Streams;
+using Windows.UI.Core;
+using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
+
+
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -28,37 +30,102 @@ namespace IotMojo
     {
         HttpClient client = new HttpClient();
         string accessToken;
+        SpeechRecognizer recognizer;
+        MediaCapture _mediaCapture;
+        IRandomAccessStream _audioStream;
+        Timer timer;
+        DispatcherTimer uiUpdate;
+        bool sttReceived = false;
+        string receivedText = string.Empty;
 
         public MainPage()
         {
             this.InitializeComponent();
+            this.Loaded += OnLoaded;
+            InitMediaCapture();
+
+            uiUpdate = new DispatcherTimer();
+            uiUpdate.Interval = new TimeSpan(0, 0, 1);
+            uiUpdate.Tick += UiUpdate_Tick;
         }
 
-        private async void btnQuery_Click(object sender, RoutedEventArgs e)
+        private void UiUpdate_Tick(object sender, object e)
+        {
+            if(sttReceived)
+            {
+                txtQuery.Text = receivedText;
+                uiUpdate.Stop();
+                GetAnswer();
+            }
+        }
+
+        private void InitTimer()
+        {
+            timer = new Timer(new TimerCallback(OnStopListening),
+                                           this,
+                                           TimeSpan.FromSeconds(5),
+                                           TimeSpan.FromMilliseconds(-1));
+
+            uiUpdate.Start();
+        }
+
+        private void OnStopListening(object state)
+        {
+            StopListening();
+        }
+
+        private async void OnLoaded(object sender, RoutedEventArgs args)
+        {
+            this.recognizer = new SpeechRecognizer();
+
+            var commands = new Dictionary<string, int>()
+            {
+                ["listen"] = 1
+            };
+            this.recognizer.Constraints.Add(new SpeechRecognitionListConstraint(commands.Keys));
+
+            await this.recognizer.CompileConstraintsAsync();
+
+            await this.recognizer.CompileConstraintsAsync();
+
+            this.recognizer.ContinuousRecognitionSession.ResultGenerated +=
+              async (s, e) =>
+              {
+                  if ((e.Result != null) && (commands.ContainsKey(e.Result.Text)))
+                  {
+                      await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
+                        () =>
+                        {
+                            txtData.Text = "Listening";
+                            //this.rotateTransform.Angle += commands[e.Result.Text];
+                            Listen();
+                        }
+              );
+                      this.recognizer.ContinuousRecognitionSession.Resume();
+                  }
+              };
+
+            await this.recognizer.ContinuousRecognitionSession.StartAsync(
+              SpeechContinuousRecognitionMode.PauseOnRecognition);
+        }
+
+        private void btnQuery_Click(object sender, RoutedEventArgs e)
+        {
+            GetAnswer();
+        }
+
+        private async void GetAnswer()
         {
             if (!string.IsNullOrEmpty(txtQuery.Text))
             {
                 var wikiQuery = QueryLuis(txtQuery.Text);
-                if(!string.IsNullOrEmpty(wikiQuery))
+                if (!string.IsNullOrEmpty(wikiQuery))
                 {
                     var responseData = QueryWiki(wikiQuery);
-                    if(!string.IsNullOrEmpty(responseData))
+                    if (!string.IsNullOrEmpty(responseData))
                     {
                         txtData.Text = responseData;
                         //CortanaAudio(txtData.Text);
-
-                        string Ssml =
-        @"<speak version='1.0' " +
-        "xmlns='http://www.w3.org/2001/10/synthesis' xml:lang='en-US'>" +
-        "Hello <prosody contour='(0%,+80Hz) (10%,+80%) (40%,+80Hz)'>World</prosody> " +
-        "<break time='500ms' />" +
-        "Goodbye <prosody rate='slow' contour='(0%,+20Hz) (10%,+30%) (40%,+10Hz)'>World</prosody>" +
-        "</speak>";
-
-                        SpeechSynthesizer synt = new SpeechSynthesizer();
-                        SpeechSynthesisStream syntStream = await synt.SynthesizeTextToStreamAsync(txtData.Text);
-                        mediaElement.SetSource(syntStream, syntStream.ContentType);
-
                     }
                     else
                     {
@@ -70,6 +137,19 @@ namespace IotMojo
                     txtData.Text = "No information found";
                 }
             }
+            else
+            {
+                txtData.Text = "Unable to get you";
+            }
+            await ReadOutText();
+            //CortanaAudio(txtData.Text);
+        }
+
+        private async System.Threading.Tasks.Task ReadOutText()
+        {
+            SpeechSynthesizer synt = new SpeechSynthesizer();
+            SpeechSynthesisStream syntStream = await synt.SynthesizeTextToStreamAsync(txtData.Text);
+            mediaElement.SetSource(syntStream, syntStream.ContentType);
         }
 
         private string QueryLuis(string query)
@@ -175,6 +255,55 @@ namespace IotMojo
         {
             txtData.Text = string.Format("Unable to complete the TTS request: [{ 0}]", e.ToString());
             //Console.WriteLine("Unable to complete the TTS request: [{0}]", e.ToString());
+        }
+
+        #region Google STT
+
+        private async void InitMediaCapture()
+        {
+            _mediaCapture = new MediaCapture();
+            var captureInitSettings = new MediaCaptureInitializationSettings();
+            captureInitSettings.StreamingCaptureMode = StreamingCaptureMode.Audio;
+            await _mediaCapture.InitializeAsync(captureInitSettings);
+            _mediaCapture.Failed += MediaCaptureOnFailed;
+            //_mediaCapture.RecordLimitationExceeded += MediaCaptureOnRecordLimitationExceeded;
+        }
+
+        private async void Listen()
+        {
+            _audioStream = new InMemoryRandomAccessStream();
+            InitTimer();
+            sttReceived = false;
+            await _mediaCapture.StartRecordToStreamAsync(MediaEncodingProfile.CreateWav(AudioEncodingQuality.High), _audioStream);
+        }
+
+        #endregion
+
+        private void btnListen_Click(object sender, RoutedEventArgs e)
+        {
+            Listen();
+        }
+
+        private void btnStop_Click(object sender, RoutedEventArgs e)
+        {
+            StopListening();
+        }
+
+        private async void StopListening()
+        {
+            await _mediaCapture.StopRecordAsync();
+            var result = await new GoogleCognitiveSpeechService().GetTextFromAudioAsync(_audioStream.AsStream());
+            sttReceived = true;
+            receivedText = result;
+        }
+
+        private async void MediaCaptureOnFailed(MediaCapture sender, MediaCaptureFailedEventArgs errorEventArgs)
+        {
+            await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
+            {
+                var warningMessage = new MessageDialog(String.Format("The audio capture failed: {0}", errorEventArgs.Message), "Capture Failed");
+                await warningMessage.ShowAsync();
+            });
         }
     }
 }

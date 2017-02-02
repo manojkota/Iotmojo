@@ -60,12 +60,6 @@
       <HintPath>..\packages\Bond.Runtime.CSharp.4.2.1\lib\net45\Bond.JSON.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="CUETools.Codecs">
-      <HintPath>..\..\cloudspeech\CloudSpeech.Console\bin\Debug\CUETools.Codecs.dll</HintPath>
-    </Reference>
-    <Reference Include="CUETools.Codecs.FLAKE">
-      <HintPath>..\..\cloudspeech\CloudSpeech.Console\bin\Debug\CUETools.Codecs.FLAKE.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.Bing.Messaging, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Bing.Speech.2.0.2\lib\net45\Microsoft.Bing.Messaging.dll</HintPath>
       <Private>True</Private>
@@ -155,6 +149,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
+    <None Include="Properties\PublishProfiles\bingaudioconverter - FTP.pubxml" />
+    <None Include="Properties\PublishProfiles\bingaudioconverter - Web Deploy.pubxml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

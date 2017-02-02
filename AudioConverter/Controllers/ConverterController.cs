@@ -1,6 +1,4 @@
-﻿using CUETools.Codecs;
-using CUETools.Codecs.FLAKE;
-using NAudio.Wave;
+﻿using NAudio.Wave;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -36,9 +34,9 @@ namespace AudioConverter.Controllers
                 }
                 return "error";
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return "error";
+                return ex.Message;
             }
         }
     }

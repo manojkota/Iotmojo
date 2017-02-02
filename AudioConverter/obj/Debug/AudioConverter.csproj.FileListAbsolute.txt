@@ -74,8 +74,6 @@ C:\OtherStuff\IotMojo\AudioConverter\bin\Bond.Attributes.dll
 C:\OtherStuff\IotMojo\AudioConverter\bin\Bond.dll
 C:\OtherStuff\IotMojo\AudioConverter\bin\Bond.IO.dll
 C:\OtherStuff\IotMojo\AudioConverter\bin\Bond.JSON.dll
-C:\OtherStuff\IotMojo\AudioConverter\bin\CUETools.Codecs.dll
-C:\OtherStuff\IotMojo\AudioConverter\bin\CUETools.Codecs.FLAKE.dll
 C:\OtherStuff\IotMojo\AudioConverter\bin\Microsoft.Bing.Messaging.dll
 C:\OtherStuff\IotMojo\AudioConverter\bin\Microsoft.Bing.Speech.dll
 C:\OtherStuff\IotMojo\AudioConverter\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll
@@ -92,8 +90,6 @@ C:\OtherStuff\IotMojo\AudioConverter\bin\Bond.xml
 C:\OtherStuff\IotMojo\AudioConverter\bin\Bond.Attributes.xml
 C:\OtherStuff\IotMojo\AudioConverter\bin\Bond.IO.xml
 C:\OtherStuff\IotMojo\AudioConverter\bin\Bond.JSON.xml
-C:\OtherStuff\IotMojo\AudioConverter\bin\CUETools.Codecs.pdb
-C:\OtherStuff\IotMojo\AudioConverter\bin\CUETools.Codecs.FLAKE.pdb
 C:\OtherStuff\IotMojo\AudioConverter\bin\Microsoft.Bing.Speech.xml
 C:\OtherStuff\IotMojo\AudioConverter\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.xml
 C:\OtherStuff\IotMojo\AudioConverter\bin\Microsoft.VisualStudio.Threading.xml
@@ -104,7 +100,6 @@ C:\OtherStuff\IotMojo\AudioConverter\bin\Wav.xml
 C:\OtherStuff\IotMojo\AudioConverter\bin\System.Net.Http.Formatting.xml
 C:\OtherStuff\IotMojo\AudioConverter\bin\System.Web.Http.xml
 C:\OtherStuff\IotMojo\AudioConverter\bin\System.Web.Http.WebHost.xml
-C:\OtherStuff\IotMojo\AudioConverter\bin\ru-RU\CUETools.Codecs.FLAKE.resources.dll
 C:\OtherStuff\IotMojo\AudioConverter\obj\Debug\AudioConverter.csprojResolveAssemblyReference.cache
 C:\OtherStuff\IotMojo\AudioConverter\obj\Debug\AudioConverter.dll
 C:\OtherStuff\IotMojo\AudioConverter\obj\Debug\AudioConverter.pdb

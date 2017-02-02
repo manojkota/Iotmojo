@@ -47,8 +47,10 @@ namespace IotMojo
         public MainPage()
         {
             this.InitializeComponent();
-            this.Loaded += OnLoaded;
+
             InitMediaCapture();
+            this.Loaded += OnLoaded;
+            
 
             uiUpdate = new DispatcherTimer();
             uiUpdate.Interval = new TimeSpan(0, 0, 1);
@@ -62,6 +64,7 @@ namespace IotMojo
                 txtQuery.Text = receivedText;
                 uiUpdate.Stop();
                 GetAnswer();
+                recognizer.ContinuousRecognitionSession.Resume();
             }
         }
 
@@ -82,17 +85,17 @@ namespace IotMojo
 
         private async void OnLoaded(object sender, RoutedEventArgs args)
         {
-            this.recognizer = new SpeechRecognizer();
+            recognizer = new SpeechRecognizer();
 
             var commands = new Dictionary<string, int>()
             {
                 ["listen"] = 1
             };
-            this.recognizer.Constraints.Add(new SpeechRecognitionListConstraint(commands.Keys));
+            recognizer.Constraints.Add(new SpeechRecognitionListConstraint(commands.Keys));
 
-            await this.recognizer.CompileConstraintsAsync();
-            
-            this.recognizer.ContinuousRecognitionSession.ResultGenerated +=
+            await recognizer.CompileConstraintsAsync();
+
+            recognizer.ContinuousRecognitionSession.ResultGenerated +=
               async (s, e) =>
               {
                   if ((e.Result != null) && (commands.ContainsKey(e.Result.Text)))
@@ -101,15 +104,15 @@ namespace IotMojo
                         () =>
                         {
                             txtData.Text = "Listening";
+                            ReadOutText();
                             Listen();
                         }
                      );
-                     this.recognizer.ContinuousRecognitionSession.Resume();
+                     recognizer.ContinuousRecognitionSession.Resume();
                   }
               };
 
-            await this.recognizer.ContinuousRecognitionSession.StartAsync(
-              SpeechContinuousRecognitionMode.PauseOnRecognition);
+            await recognizer.ContinuousRecognitionSession.StartAsync(SpeechContinuousRecognitionMode.PauseOnRecognition);
         }
 
         private void btnQuery_Click(object sender, RoutedEventArgs e)
@@ -157,6 +160,10 @@ namespace IotMojo
 
         private string QueryLuis(string query)
         {
+            if(query[query.Length-1] == '.')
+            {
+                query = query.Remove(query.Length - 1);
+            }
             var entity = string.Empty;
             var luisUrl = new Uri($"https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/49793a7f-9da1-444a-8d65-ee5008378030?subscription-key=bcc34292c7e54855a02835a097fbc1e4&q={query}&verbose=true");
             var response = client.GetAsync(luisUrl);
@@ -310,6 +317,7 @@ namespace IotMojo
             //var result = await new WatsonSpeechToText().GetTextFromAudioAsync(_audioStream.AsStream());
 
             receivedText = result;
+            //_mediaCapture.Dispose();
             sttReceived = true;
         }
 

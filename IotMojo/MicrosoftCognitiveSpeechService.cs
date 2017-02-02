@@ -15,7 +15,7 @@ namespace IotMojo
 
         public async Task<string> Transcribe(Stream audiostream)
         {
-            var requestUri = @"http://localhost:58466/api/Converter";
+            var requestUri = @"http://bingaudioconverter.azurewebsites.net/api/Converter";
 
             using (var client = new HttpClient())
             {

@@ -29,7 +29,7 @@ namespace AudioConverter.Controllers
                     WaveFileWriter.CreateWaveFile(HostingEnvironment.MapPath("~/Temp/test.wav"), str);
 
                     SpeechToText txt = new SpeechToText();
-                    var retValue = await txt.Run(str, "en-US", "4a47c14e828f40b8801c67212766e0f5");
+                    var retValue = await txt.Run(str, "en-IN", "4a47c14e828f40b8801c67212766e0f5");
                     return retValue;
                 }
                 return "error";

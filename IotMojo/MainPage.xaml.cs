@@ -89,7 +89,7 @@ namespace IotMojo
 
             var commands = new Dictionary<string, int>()
             {
-                ["listen"] = 1
+                ["mojo"] = 1
             };
             recognizer.Constraints.Add(new SpeechRecognitionListConstraint(commands.Keys));
 
@@ -178,7 +178,7 @@ namespace IotMojo
                         for (int i = 0; i < luisResponse.entities.Count; i++)
                         {
                             var entityType = luisResponse.entities[i].type.ToString();
-                            if (entityType.Contains("builtin.encyclopedia"))
+                            if (entityType.Contains("builtin.encyclopedia") || entityType.Contains("builtin.geography"))
                             {
                                 entity = luisResponse.entities[i].entity.ToString();
                                 break;

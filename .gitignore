@@ -1,3 +1,6 @@
 IotMojo/bin/
 IotMojo/obj/
 .vs/IotMojo/v14/.suo
+/packages
+/AudioConverter/Temp/test.wav
+/AudioConverter/bin

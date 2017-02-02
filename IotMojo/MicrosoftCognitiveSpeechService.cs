@@ -7,10 +7,32 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace IotMojo
 {
     public class MicrosoftCognitiveSpeechService
     {
+
+        public async Task<string> Transcribe(Stream audiostream)
+        {
+            var requestUri = @"http://localhost:58466/api/Converter";
+
+            using (var client = new HttpClient())
+            {
+                audiostream.Position = 0;
+                var response = await client.PostAsync(requestUri, new StreamContent(audiostream));
+                var responseString = response.Content.ReadAsStringAsync().Result;
+                try
+                {
+                    dynamic data = JsonConvert.DeserializeObject(responseString);
+                    return data;
+                }
+                catch (JsonReaderException ex)
+                {
+                    throw new Exception(responseString, ex);
+                }
+            }
+        }
         /// <summary>
         /// Gets text from an audio stream.
         /// </summary>

@@ -5,10 +5,15 @@ using System.IO;
 using System.Net.Http;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading;
+using Windows.Devices.Enumeration;
+using Windows.Foundation;
+using Windows.Media;
 using Windows.Media.Capture;
+using Windows.Media.Devices;
 using Windows.Media.MediaProperties;
 using Windows.Media.SpeechRecognition;
 using Windows.Media.SpeechSynthesis;
+using Windows.Media.Transcoding;
 using Windows.Storage;
 using Windows.Storage.Pickers;
 using Windows.Storage.Streams;
@@ -16,6 +21,7 @@ using Windows.UI.Core;
 using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+
 
 
 
@@ -85,9 +91,7 @@ namespace IotMojo
             this.recognizer.Constraints.Add(new SpeechRecognitionListConstraint(commands.Keys));
 
             await this.recognizer.CompileConstraintsAsync();
-
-            await this.recognizer.CompileConstraintsAsync();
-
+            
             this.recognizer.ContinuousRecognitionSession.ResultGenerated +=
               async (s, e) =>
               {
@@ -97,11 +101,10 @@ namespace IotMojo
                         () =>
                         {
                             txtData.Text = "Listening";
-                            //this.rotateTransform.Angle += commands[e.Result.Text];
                             Listen();
                         }
-              );
-                      this.recognizer.ContinuousRecognitionSession.Resume();
+                     );
+                     this.recognizer.ContinuousRecognitionSession.Resume();
                   }
               };
 
@@ -274,7 +277,16 @@ namespace IotMojo
             _audioStream = new InMemoryRandomAccessStream();
             InitTimer();
             sttReceived = false;
+
+            var localizationDirectory = await Windows.ApplicationModel.Package.Current.InstalledLocation.GetFolderAsync(@"Assets");
+            StorageFile sampleFile = await localizationDirectory.GetFileAsync("audio.flac");
+            //var stream = await sampleFile.OpenReadAsync();
+
+            var profile = await MediaEncodingProfile.CreateFromFileAsync(sampleFile);
+            
             await _mediaCapture.StartRecordToStreamAsync(MediaEncodingProfile.CreateWav(AudioEncodingQuality.High), _audioStream);
+            //await _mediaCapture.StartRecordToStreamAsync(profile, _audioStream);
+
         }
 
         #endregion
@@ -292,9 +304,13 @@ namespace IotMojo
         private async void StopListening()
         {
             await _mediaCapture.StopRecordAsync();
-            var result = await new GoogleCognitiveSpeechService().GetTextFromAudioAsync(_audioStream.AsStream());
-            sttReceived = true;
+            
+            var result = await new MicrosoftCognitiveSpeechService().Transcribe(_audioStream.AsStream());
+            //var result = await new GoogleCognitiveSpeechService().GetTextFromAudioAsync(_audioStream.AsStream());
+            //var result = await new WatsonSpeechToText().GetTextFromAudioAsync(_audioStream.AsStream());
+
             receivedText = result;
+            sttReceived = true;
         }
 
         private async void MediaCaptureOnFailed(MediaCapture sender, MediaCaptureFailedEventArgs errorEventArgs)

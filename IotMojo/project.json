@@ -3,6 +3,8 @@
     "Google.Apis.CloudSpeechAPI.v1beta1": "1.16.0.607",
     "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
     "Newtonsoft.Json": "9.0.1",
+    "System.ComponentModel": "4.3.0",
+    "System.ComponentModel.Annotations": "4.3.0",
     "System.Diagnostics.Tools": "4.3.0",
     "System.Net.Sockets": "4.3.0",
     "System.Threading.Tasks": "4.3.0",

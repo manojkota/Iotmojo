@@ -5,16 +5,21 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IotMojo", "IotMojo\IotMojo.csproj", "{DB11ACE8-8093-4B44-AF2B-E256D09A3D54}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AudioConverter", "AudioConverter\AudioConverter.csproj", "{35520216-41CB-4A0B-B338-A9BB388A197D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
 		Debug|ARM = Debug|ARM
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
 		Release|ARM = Release|ARM
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DB11ACE8-8093-4B44-AF2B-E256D09A3D54}.Debug|Any CPU.ActiveCfg = Debug|x86
 		{DB11ACE8-8093-4B44-AF2B-E256D09A3D54}.Debug|ARM.ActiveCfg = Debug|ARM
 		{DB11ACE8-8093-4B44-AF2B-E256D09A3D54}.Debug|ARM.Build.0 = Debug|ARM
 		{DB11ACE8-8093-4B44-AF2B-E256D09A3D54}.Debug|ARM.Deploy.0 = Debug|ARM
@@ -24,6 +29,7 @@ Global
 		{DB11ACE8-8093-4B44-AF2B-E256D09A3D54}.Debug|x86.ActiveCfg = Debug|x86
 		{DB11ACE8-8093-4B44-AF2B-E256D09A3D54}.Debug|x86.Build.0 = Debug|x86
 		{DB11ACE8-8093-4B44-AF2B-E256D09A3D54}.Debug|x86.Deploy.0 = Debug|x86
+		{DB11ACE8-8093-4B44-AF2B-E256D09A3D54}.Release|Any CPU.ActiveCfg = Release|x86
 		{DB11ACE8-8093-4B44-AF2B-E256D09A3D54}.Release|ARM.ActiveCfg = Release|ARM
 		{DB11ACE8-8093-4B44-AF2B-E256D09A3D54}.Release|ARM.Build.0 = Release|ARM
 		{DB11ACE8-8093-4B44-AF2B-E256D09A3D54}.Release|ARM.Deploy.0 = Release|ARM
@@ -33,6 +39,22 @@ Global
 		{DB11ACE8-8093-4B44-AF2B-E256D09A3D54}.Release|x86.ActiveCfg = Release|x86
 		{DB11ACE8-8093-4B44-AF2B-E256D09A3D54}.Release|x86.Build.0 = Release|x86
 		{DB11ACE8-8093-4B44-AF2B-E256D09A3D54}.Release|x86.Deploy.0 = Release|x86
+		{35520216-41CB-4A0B-B338-A9BB388A197D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{35520216-41CB-4A0B-B338-A9BB388A197D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{35520216-41CB-4A0B-B338-A9BB388A197D}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{35520216-41CB-4A0B-B338-A9BB388A197D}.Debug|ARM.Build.0 = Debug|Any CPU
+		{35520216-41CB-4A0B-B338-A9BB388A197D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{35520216-41CB-4A0B-B338-A9BB388A197D}.Debug|x64.Build.0 = Debug|Any CPU
+		{35520216-41CB-4A0B-B338-A9BB388A197D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{35520216-41CB-4A0B-B338-A9BB388A197D}.Debug|x86.Build.0 = Debug|Any CPU
+		{35520216-41CB-4A0B-B338-A9BB388A197D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{35520216-41CB-4A0B-B338-A9BB388A197D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{35520216-41CB-4A0B-B338-A9BB388A197D}.Release|ARM.ActiveCfg = Release|Any CPU
+		{35520216-41CB-4A0B-B338-A9BB388A197D}.Release|ARM.Build.0 = Release|Any CPU
+		{35520216-41CB-4A0B-B338-A9BB388A197D}.Release|x64.ActiveCfg = Release|Any CPU
+		{35520216-41CB-4A0B-B338-A9BB388A197D}.Release|x64.Build.0 = Release|Any CPU
+		{35520216-41CB-4A0B-B338-A9BB388A197D}.Release|x86.ActiveCfg = Release|Any CPU
+		{35520216-41CB-4A0B-B338-A9BB388A197D}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

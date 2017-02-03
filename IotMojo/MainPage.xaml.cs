@@ -5,6 +5,7 @@ using System.IO;
 using System.Net.Http;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading;
+using System.Threading.Tasks;
 using Windows.Devices.Enumeration;
 using Windows.Foundation;
 using Windows.Media;
@@ -50,7 +51,6 @@ namespace IotMojo
 
             InitMediaCapture();
             this.Loaded += OnLoaded;
-            
 
             uiUpdate = new DispatcherTimer();
             uiUpdate.Interval = new TimeSpan(0, 0, 1);
@@ -124,6 +124,7 @@ namespace IotMojo
         {
             if (!string.IsNullOrEmpty(txtQuery.Text))
             {
+                var answered = false;
                 var wikiQuery = QueryLuis(txtQuery.Text);
                 if (!string.IsNullOrEmpty(wikiQuery))
                 {
@@ -137,8 +138,15 @@ namespace IotMojo
                     {
                         txtData.Text = "No information found";
                     }
+                    answered = true;
                 }
                 else
+                {
+                    txtData.Text = QueryApiAi(txtQuery.Text);
+                    answered = true;
+                }
+
+                if(!answered)
                 {
                     txtData.Text = "No information found";
                 }
@@ -148,7 +156,6 @@ namespace IotMojo
                 txtData.Text = "Unable to get you";
             }
             await ReadOutText();
-            //CortanaAudio(txtData.Text);
         }
 
         private async System.Threading.Tasks.Task ReadOutText()
@@ -207,6 +214,82 @@ namespace IotMojo
                 }
             }
             return data;
+        }
+
+        private string QueryApiAi(string query)
+        {
+            try
+            {
+                string uri = $"https://api.api.ai/v1/query?v=20150910&query={query}&lang=en&sessionId=1234567890";
+                using (var aiCLient = new HttpClient())
+                {
+                    aiCLient.DefaultRequestHeaders.Add("Authorization", "Bearer d6fcde5fcad846b3a26f25827bbd06a3");
+                    var response = aiCLient.GetAsync(new Uri(uri));
+                    var dataString = response.Result.Content.ReadAsStringAsync();
+
+                    dynamic data = JsonConvert.DeserializeObject(dataString.Result);
+                    var intentName = data.result.metadata.intentName.ToString();
+                    if (intentName == "wordmeaning" || intentName == "spell_intent")
+                    {
+                        if (data.result.parameters != null && data.result.parameters["dictionary"] != null && !string.IsNullOrEmpty(data.result.parameters["dictionary"].ToString()))
+                        {
+                            string result = data.result.parameters["dictionary"].ToString();
+
+                            if (intentName == "spell_intent")
+                            {
+                                return string.Join(" ", result.ToCharArray()).ToUpper();
+                            }
+                            else
+                            {
+                                return QueryDictionary(result);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return string.Empty;
+            }
+            return string.Empty;
+        }
+
+        private string QueryDictionary(string query)
+        {
+            try
+            {
+                string uri = $"https://od-api.oxforddictionaries.com:443/api/v1/entries/en/{query}/definitions";
+                using (var aiCLient = new HttpClient())
+                {
+                    aiCLient.DefaultRequestHeaders.Add("app_id", "e664b07c");
+                    aiCLient.DefaultRequestHeaders.Add("app_key", "3b355ce77502ab9fb7bdd67f8a60f11c");
+
+                    var response = aiCLient.GetAsync(new Uri(uri));
+                    var dataString = response.Result.Content.ReadAsStringAsync();
+
+                    dynamic data = JsonConvert.DeserializeObject(dataString.Result);
+
+                    if (data.results != null
+                        && data.results[0] != null
+                        && data.results[0].lexicalEntries!=null
+                        && data.results[0].lexicalEntries[0] != null
+                        && data.results[0].lexicalEntries[0].entries != null
+                        && data.results[0].lexicalEntries[0].entries[0] != null
+                        && data.results[0].lexicalEntries[0].entries[0].senses != null
+                        && data.results[0].lexicalEntries[0].entries[0].senses[0] != null
+                        && data.results[0].lexicalEntries[0].entries[0].senses[0].definitions!=null
+                        && data.results[0].lexicalEntries[0].entries[0].senses[0].definitions[0] != null)
+                    {
+                        return data.results[0].lexicalEntries[0].entries[0].senses[0].definitions[0].ToString();
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return string.Empty;
+            }
+            return string.Empty;
         }
 
         private void CortanaAudio(string inputText)

@@ -49,8 +49,9 @@ namespace IotMojo
         {
             this.InitializeComponent();
 
-            InitMediaCapture();
             this.Loaded += OnLoaded;
+            InitMediaCapture();
+            
 
             uiUpdate = new DispatcherTimer();
             uiUpdate.Interval = new TimeSpan(0, 0, 1);
@@ -64,7 +65,10 @@ namespace IotMojo
                 txtQuery.Text = receivedText;
                 uiUpdate.Stop();
                 GetAnswer();
-                recognizer.ContinuousRecognitionSession.Resume();
+                //if (recognizer.State == SpeechRecognizerState.Idle || recognizer.State == SpeechRecognizerState.Paused)
+                //{
+                //    recognizer.ContinuousRecognitionSession.Resume();
+                //}
             }
         }
 
@@ -89,7 +93,7 @@ namespace IotMojo
 
             var commands = new Dictionary<string, int>()
             {
-                ["mojo"] = 1
+                ["bablu"] = 1
             };
             recognizer.Constraints.Add(new SpeechRecognitionListConstraint(commands.Keys));
 
@@ -105,6 +109,7 @@ namespace IotMojo
                         {
                             txtData.Text = "Listening";
                             ReadOutText();
+                            //recognizer.ContinuousRecognitionSession.PauseAsync();
                             Listen();
                         }
                      );
@@ -143,7 +148,7 @@ namespace IotMojo
                 else
                 {
                     txtData.Text = QueryApiAi(txtQuery.Text);
-                    answered = true;
+                    answered = !string.IsNullOrEmpty(txtData.Text);
                 }
 
                 if(!answered)
@@ -160,9 +165,17 @@ namespace IotMojo
 
         private async System.Threading.Tasks.Task ReadOutText()
         {
+            
+            recognizer.ContinuousRecognitionSession.PauseAsync();
+            
             SpeechSynthesizer synt = new SpeechSynthesizer();
             SpeechSynthesisStream syntStream = await synt.SynthesizeTextToStreamAsync(txtData.Text);
             mediaElement.SetSource(syntStream, syntStream.ContentType);
+            if (recognizer.State == SpeechRecognizerState.Idle || recognizer.State == SpeechRecognizerState.Paused)
+            {
+                recognizer.ContinuousRecognitionSession.Resume();
+            }
+            
         }
 
         private string QueryLuis(string query)
@@ -359,24 +372,34 @@ namespace IotMojo
             captureInitSettings.StreamingCaptureMode = StreamingCaptureMode.Audio;
             await _mediaCapture.InitializeAsync(captureInitSettings);
             _mediaCapture.Failed += MediaCaptureOnFailed;
+            
             //_mediaCapture.RecordLimitationExceeded += MediaCaptureOnRecordLimitationExceeded;
         }
 
         private async void Listen()
         {
-            _audioStream = new InMemoryRandomAccessStream();
-            InitTimer();
-            sttReceived = false;
+            try
+            {
+                recognizer.ContinuousRecognitionSession.PauseAsync();
+                _audioStream = new InMemoryRandomAccessStream();
+                InitTimer();
+                sttReceived = false;
 
-            var localizationDirectory = await Windows.ApplicationModel.Package.Current.InstalledLocation.GetFolderAsync(@"Assets");
-            StorageFile sampleFile = await localizationDirectory.GetFileAsync("audio.flac");
-            //var stream = await sampleFile.OpenReadAsync();
+                var localizationDirectory = await Windows.ApplicationModel.Package.Current.InstalledLocation.GetFolderAsync(@"Assets");
+                StorageFile sampleFile = await localizationDirectory.GetFileAsync("audio.flac");
+                //var stream = await sampleFile.OpenReadAsync();
 
-            var profile = await MediaEncodingProfile.CreateFromFileAsync(sampleFile);
-            
-            await _mediaCapture.StartRecordToStreamAsync(MediaEncodingProfile.CreateWav(AudioEncodingQuality.High), _audioStream);
-            //await _mediaCapture.StartRecordToStreamAsync(profile, _audioStream);
+                var profile = await MediaEncodingProfile.CreateFromFileAsync(sampleFile);
 
+                await _mediaCapture.StartRecordToStreamAsync(MediaEncodingProfile.CreateWav(AudioEncodingQuality.High), _audioStream);
+                //await _mediaCapture.StartRecordToStreamAsync(profile, _audioStream);
+            }
+            catch (Exception ex)
+            {
+                //txtData.Text = ex.ToString();
+                txtData.Text = "Something went wrong. Please try again";
+                ReadOutText();
+            }
         }
 
         #endregion
@@ -393,15 +416,27 @@ namespace IotMojo
 
         private async void StopListening()
         {
-            await _mediaCapture.StopRecordAsync();
-            
-            var result = await new MicrosoftCognitiveSpeechService().Transcribe(_audioStream.AsStream());
-            //var result = await new GoogleCognitiveSpeechService().GetTextFromAudioAsync(_audioStream.AsStream());
-            //var result = await new WatsonSpeechToText().GetTextFromAudioAsync(_audioStream.AsStream());
+            try
+            {
+                
+                await _mediaCapture.StopRecordAsync();
+                //txtData.Text = "Thinking about the answer";
+                //ReadOutText();
+                var result = await new MicrosoftCognitiveSpeechService().Transcribe(_audioStream.AsStream());
+                //var result = await new GoogleCognitiveSpeechService().GetTextFromAudioAsync(_audioStream.AsStream());
+                //var result = await new WatsonSpeechToText().GetTextFromAudioAsync(_audioStream.AsStream());
 
-            receivedText = result;
-            //_mediaCapture.Dispose();
-            sttReceived = true;
+                receivedText = result;
+                //_mediaCapture.Dispose();
+                sttReceived = true;
+            }
+            catch (Exception ex)
+            {
+                receivedText = "Something went wrong. Please try again";
+                sttReceived = true;
+                //txtData.Text = "Something went wrong. Please try again";
+                //ReadOutText();
+            }
         }
 
         private async void MediaCaptureOnFailed(MediaCapture sender, MediaCaptureFailedEventArgs errorEventArgs)

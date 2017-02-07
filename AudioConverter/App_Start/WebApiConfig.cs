@@ -16,6 +16,7 @@ namespace AudioConverter
             config.MapHttpAttributeRoutes();
             
             config.Formatters.JsonFormatter.SupportedMediaTypes.Add(new MediaTypeHeaderValue("audio/wav"));
+            config.Formatters.JsonFormatter.SupportedMediaTypes.Add(new MediaTypeHeaderValue("audio/flac"));
             config.Formatters.JsonFormatter.SupportedMediaTypes.Add(new MediaTypeHeaderValue("application/octet-stream"));
 
             config.Routes.MapHttpRoute(

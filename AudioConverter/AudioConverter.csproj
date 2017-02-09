@@ -64,11 +64,13 @@
       <HintPath>..\packages\BouncyCastle.1.7.0\lib\Net40-Client\BouncyCastle.Crypto.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="CUETools.Codecs">
-      <HintPath>..\..\cloudspeech\CUETools.Codecs\obj\Debug\CUETools.Codecs.dll</HintPath>
+    <Reference Include="CUETools.Codecs, Version=2.1.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\CUETools.Codecs.dll</HintPath>
     </Reference>
-    <Reference Include="CUETools.Codecs.FLAKE">
-      <HintPath>..\..\cloudspeech\CUETools.Codecs.FLAKE\obj\Debug\CUETools.Codecs.FLAKE.dll</HintPath>
+    <Reference Include="CUETools.Codecs.FLAKE, Version=2.1.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\CUETools.Codecs.FLAKE.dll</HintPath>
     </Reference>
     <Reference Include="Google.Apis, Version=1.16.0.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
       <HintPath>..\packages\Google.Apis.1.16.0\lib\net45\Google.Apis.dll</HintPath>

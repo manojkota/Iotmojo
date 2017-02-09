@@ -115,6 +115,7 @@
   <ItemGroup>
     <Content Include="Assets\audio.flac" />
     <Content Include="Assets\audio.raw" />
+    <Content Include="Assets\beep.mp3" />
     <Content Include="Assets\gaudio.flac" />
     <Content Include="Properties\Default.rd.xml" />
     <Content Include="Assets\LockScreenLogo.scale-200.png" />

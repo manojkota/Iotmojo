@@ -34,7 +34,7 @@ namespace AudioConverter
                     {
                         Encoding = "FLAC",
                         SampleRate = 16000,
-                        LanguageCode = "en-US"
+                        LanguageCode = "en-IN"
                     },
                     Audio = new RecognitionAudio()
                     {

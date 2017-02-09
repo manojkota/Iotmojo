@@ -160,20 +160,25 @@ namespace IotMojo
             {
                 txtData.Text = "Unable to get you";
             }
+            StopThinkingSound();
             await ReadOutText();
         }
 
-        private async System.Threading.Tasks.Task ReadOutText()
+        private async Task ReadOutText()
         {
             
-            recognizer.ContinuousRecognitionSession.PauseAsync();
+            await recognizer.ContinuousRecognitionSession.PauseAsync();
             
             SpeechSynthesizer synt = new SpeechSynthesizer();
             SpeechSynthesisStream syntStream = await synt.SynthesizeTextToStreamAsync(txtData.Text);
             mediaElement.SetSource(syntStream, syntStream.ContentType);
-            if (recognizer.State == SpeechRecognizerState.Idle || recognizer.State == SpeechRecognizerState.Paused)
+
+            if (mediaElement.CurrentState == Windows.UI.Xaml.Media.MediaElementState.Stopped || mediaElement.CurrentState == Windows.UI.Xaml.Media.MediaElementState.Closed)
             {
-                recognizer.ContinuousRecognitionSession.Resume();
+                if (recognizer.State == SpeechRecognizerState.Idle || recognizer.State == SpeechRecognizerState.Paused)
+                {
+                    recognizer.ContinuousRecognitionSession.Resume();
+                }
             }
             
         }
@@ -422,6 +427,7 @@ namespace IotMojo
                 await _mediaCapture.StopRecordAsync();
                 //txtData.Text = "Thinking about the answer";
                 //ReadOutText();
+                
                 var result = await new MicrosoftCognitiveSpeechService().Transcribe(_audioStream.AsStream());
                 //var result = await new GoogleCognitiveSpeechService().GetTextFromAudioAsync(_audioStream.AsStream());
                 //var result = await new WatsonSpeechToText().GetTextFromAudioAsync(_audioStream.AsStream());
@@ -446,6 +452,21 @@ namespace IotMojo
                 var warningMessage = new MessageDialog(String.Format("The audio capture failed: {0}", errorEventArgs.Message), "Capture Failed");
                 await warningMessage.ShowAsync();
             });
+        }
+
+        private async void PlayThinking()
+        {
+            StorageFolder Folder = Windows.ApplicationModel.Package.Current.InstalledLocation;
+            Folder = await Folder.GetFolderAsync("Assets");
+            StorageFile sf = await Folder.GetFileAsync("beep.mp3");
+            mediaElement.SetSource(await sf.OpenAsync(FileAccessMode.Read), sf.ContentType);
+            mediaElement.Play();
+            mediaElement.IsLooping = true;
+        }
+
+        private void StopThinkingSound()
+        {
+            mediaElement.Stop();
         }
     }
 }
